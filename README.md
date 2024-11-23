@@ -1,0 +1,3 @@
+# はじめに
+
+PythonからBigQueryにデータをインサート、削除するためのtutorial
