@@ -1,0 +1,39 @@
+WITH core AS (
+    SELECT
+        id
+        , order_date
+        , DATE_SUB(order_date, INTERVAL 52 WEEK) AS week_52_ago
+        , user_type
+        , category
+        , sales
+        , day
+        , `set`
+    FROM
+        `sample.purchase_history`
+)
+
+, agg AS (
+    SELECT
+        DATE_TRUNC(order_date, MONTH) AS month
+        , 'ALL' AS category
+        , SUM(sales) AS sales
+        , COUNT(DISTINCT IF(user_type = '新規', id, NULL)) AS new_uu
+        , COUNT(DISTINCT IF(user_type = '既存', id, NULL)) AS exist_uu
+    FROM
+        core
+    GROUP BY 1, 2
+
+    UNION ALL
+
+    SELECT
+        DATE_TRUNC(order_date, MONTH) AS month
+        , category AS category
+        , SUM(sales) AS sales
+        , COUNT(DISTINCT IF(user_type = '新規', id, NULL)) AS new_uu
+        , COUNT(DISTINCT IF(user_type = '既存', id, NULL)) AS exist_uu
+    FROM
+        core
+    GROUP BY 1, 2
+)
+
+SELECT * FROM agg;
